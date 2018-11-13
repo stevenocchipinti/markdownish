@@ -1,0 +1,58 @@
+.cm-s-markdownish .cm-header {
+  font-weight: bold;
+  color: #444;
+}
+
+.cm-s-markdownish .cm-header-1 {
+  font-size: 1.8em;
+}
+.cm-s-markdownish .cm-header-2 {
+  font-size: 1.6em;
+}
+.cm-s-markdownish .cm-header-3 {
+  font-size: 1.5em;
+}
+.cm-s-markdownish .cm-header-4 {
+  font-size: 1.4em;
+}
+.cm-s-markdownish .cm-header-5 {
+  font-size: 1.3em;
+}
+.cm-s-markdownish .cm-header-6 {
+  font-size: 1em;
+}
+
+/* .cm-s-markdownish .cm-quote {color: #090;} */
+/* .cm-negative {color: #d44;} */
+/* .cm-positive {color: #292;} */
+/* .cm-header, .cm-strong {font-weight: bold;} */
+/* .cm-em {font-style: italic;} */
+/* .cm-link {text-decoration: underline;} */
+/* .cm-strikethrough {text-decoration: line-through;} */
+
+/* .cm-s-markdownish .cm-keyword {color: #708;} */
+/* .cm-s-markdownish .cm-atom {color: #219;} */
+/* .cm-s-markdownish .cm-number {color: #164;} */
+/* .cm-s-markdownish .cm-def {color: #00f;} */
+/* .cm-s-markdownish .cm-variable, */
+/* .cm-s-markdownish .cm-punctuation, */
+/* .cm-s-markdownish .cm-property, */
+/* .cm-s-markdownish .cm-operator {} */
+/* .cm-s-markdownish .cm-variable-2 {color: #05a;} */
+/* .cm-s-markdownish .cm-variable-3, .cm-s-markdownish .cm-type {color: #085;} */
+/* .cm-s-markdownish .cm-comment {color: #a50;} */
+/* .cm-s-markdownish .cm-string {color: #a11;} */
+/* .cm-s-markdownish .cm-string-2 {color: #f50;} */
+/* .cm-s-markdownish .cm-meta {color: #555;} */
+/* .cm-s-markdownish .cm-qualifier {color: #555;} */
+/* .cm-s-markdownish .cm-builtin {color: #30a;} */
+/* .cm-s-markdownish .cm-bracket {color: #997;} */
+/* .cm-s-markdownish .cm-tag {color: #170;} */
+/* .cm-s-markdownish .cm-attribute {color: #00c;} */
+/* .cm-s-markdownish .cm-hr {color: #999;} */
+/* .cm-s-markdownish .cm-link {color: #00c;} */
+
+/* .cm-s-markdownish .cm-error {color: #f00;} */
+/* .cm-invalidchar {color: #f00;} */
+
+/* .CodeMirror-composing { border-bottom: 2px solid; } */
