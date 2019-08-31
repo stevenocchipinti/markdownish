@@ -56,7 +56,7 @@ class App extends Component {
 
   componentDidMount() {
     const notesJSON = localStorage.getItem("notes")
-    const notes = notesJSON ? JSON.parse(notesJSON) : []
+    const notes = notesJSON ? JSON.parse(notesJSON) : [nullNote]
     const selectedNoteIndex = 0
     this.setState({ notes, selectedNoteIndex })
   }

@@ -2,16 +2,23 @@ import React, { Component } from "react"
 import styled from "styled-components"
 
 const Toolbar = styled.div`
+  position: fixed;
+  bottom: 0;
   display: flex;
   justify-content: space-evenly;
   width: 100%;
+  height: 4rem;
   border-top: 1px solid #ddd;
   padding: 10px;
+  background-color: white;
+  z-index: 2;
 `
 
 const Button = styled.button`
   font-size: 2rem;
   flex-grow: 1;
+  background-color: white;
+  border: none;
 `
 
 export default class NavigationToolbar extends Component {
@@ -20,7 +27,13 @@ export default class NavigationToolbar extends Component {
     this.state = {
       moveMode: "↔",
       moveTouch: null,
-      startX: null,
+      moveStartX: null,
+      moveStartY: null,
+
+      functionMode: "•",
+      functionTouch: null,
+      functionStartX: null,
+      functionStartY: null,
       steps: 0
     }
   }
@@ -36,40 +49,50 @@ export default class NavigationToolbar extends Component {
   left() {
     const command = {
       word: "goWordLeft",
+      line: "goLineUp",
       doc: "goDocStart"
     }[this.state.moveMode]
     this.props.codeMirror.focus()
     this.props.codeMirror.execCommand(command)
+    navigator.vibrate(10)
   }
 
   right() {
     const command = {
       word: "goWordRight",
+      line: "goLineDown",
       doc: "goDocEnd"
     }[this.state.moveMode]
     this.props.codeMirror.focus()
     this.props.codeMirror.execCommand(command)
+    navigator.vibrate(10)
   }
 
   touchStart(e) {
+    e.stopPropagation()
     const touch = e.touches.length - 1
     this.setState({
       moveMode: "word",
       moveTouch: touch,
-      startX: e.touches[touch].clientX,
-      startY: e.touches[touch].clientY,
+      moveStartX: e.touches[touch].clientX,
+      moveStartY: e.touches[touch].clientY,
       steps: 0
     })
   }
 
   touchMove(e) {
-    const { moveTouch, startX, startY, moveMode, steps } = this.state
-    const Ydiff = e.touches[moveTouch].clientY - startY
-    const Xdiff = e.touches[moveTouch].clientX - startX
+    e.stopPropagation()
+    const { moveTouch, moveStartX, moveStartY, moveMode, steps } = this.state
+    const Ydiff = e.touches[moveTouch].clientY - moveStartY
+    const Xdiff = e.touches[moveTouch].clientX - moveStartX
 
-    const newMoveMode = Ydiff < -40 ? "doc" : "word"
+    let newMoveMode = "word"
+    if (Ydiff < -80) newMoveMode = "doc"
+    else if (Ydiff < -40) newMoveMode = "line"
+
     if (newMoveMode !== moveMode) {
       this.setState({ moveMode: newMoveMode })
+      navigator.vibrate(80)
     }
 
     const newSteps = Math.round(Xdiff / 20)
@@ -79,7 +102,8 @@ export default class NavigationToolbar extends Component {
   }
 
   touchEnd(e) {
-    this.setState({ moveMode: "↔", moveTouch: null, startX: null, steps: 0 })
+    e.stopPropagation()
+    this.setState({ moveMode: "↔", functionMode: "•" })
   }
 
   render() {

@@ -19,6 +19,7 @@ const GlobalStyle = createGlobalStyle`
     font-family: Nunito, Arial, monospace;
     font-size: 16px;
     padding: 30px;
+    margin-bottom: 4rem;
     height: 100%;
 
     /*@media (prefers-color-scheme: dark) {
