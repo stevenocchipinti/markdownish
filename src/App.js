@@ -76,6 +76,7 @@ class App extends Component {
   }
 
   updateSelectedNote({ data }) {
+    console.log(";")
     this.setState(({ notes, selectedNoteIndex }) => ({
       notes: [
         ...notes.slice(0, selectedNoteIndex),

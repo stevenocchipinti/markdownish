@@ -19,6 +19,7 @@ const Button = styled.button`
   flex-grow: 1;
   background-color: white;
   border: none;
+  user-select: none;
 `
 
 export default class NavigationToolbar extends Component {
@@ -30,15 +31,17 @@ export default class NavigationToolbar extends Component {
       moveStartX: null,
       moveStartY: null,
 
-      functionMode: "•",
+      functionMode: "delete",
       functionTouch: null,
       functionStartX: null,
       functionStartY: null,
+
       steps: 0
     }
   }
 
   componentDidUpdate(prevProps, prevState) {
+    console.log(".", prevState.steps, this.state.steps)
     if (prevState.steps > this.state.steps) {
       this.left()
     } else if (prevState.steps < this.state.steps) {
@@ -47,29 +50,51 @@ export default class NavigationToolbar extends Component {
   }
 
   left() {
-    const command = {
-      word: "goWordLeft",
-      line: "goLineUp",
-      doc: "goDocStart"
-    }[this.state.moveMode]
-    this.props.codeMirror.focus()
-    this.props.codeMirror.execCommand(command)
-    navigator.vibrate(10)
+    let command = ""
+    if (this.state.functionMode === "delete")
+      command = {
+        word: "delWordBefore",
+        line: "delWrappedLineLeft",
+        doc: ""
+      }[this.state.moveMode]
+    else
+      command = {
+        word: "goWordLeft",
+        line: "goLineUp",
+        doc: "goDocStart"
+      }[this.state.moveMode]
+    this.execCommand(command)
   }
 
   right() {
-    const command = {
-      word: "goWordRight",
-      line: "goLineDown",
-      doc: "goDocEnd"
-    }[this.state.moveMode]
+    let command = ""
+    if (this.state.functionMode === "delete")
+      command = {
+        word: "delWordAfter",
+        line: "delWrappedLineRight",
+        doc: ""
+      }[this.state.moveMode]
+    else
+      command = {
+        word: "goWordRight",
+        line: "goLineDown",
+        doc: "goDocEnd"
+      }[this.state.moveMode]
+    this.execCommand(command)
+  }
+
+  execCommand(command) {
+    console.log(command)
     this.props.codeMirror.focus()
     this.props.codeMirror.execCommand(command)
     navigator.vibrate(10)
   }
 
-  touchStart(e) {
-    e.stopPropagation()
+  //////////////////////////////////////////////////////////////////////////////
+  // MOVEMENT TOUCH HANDLERS
+  //////////////////////////////////////////////////////////////////////////////
+
+  moveTouchStart(e) {
     const touch = e.touches.length - 1
     this.setState({
       moveMode: "word",
@@ -80,8 +105,7 @@ export default class NavigationToolbar extends Component {
     })
   }
 
-  touchMove(e) {
-    e.stopPropagation()
+  moveTouchMove(e) {
     const { moveTouch, moveStartX, moveStartY, moveMode, steps } = this.state
     const Ydiff = e.touches[moveTouch].clientY - moveStartY
     const Xdiff = e.touches[moveTouch].clientX - moveStartX
@@ -101,19 +125,47 @@ export default class NavigationToolbar extends Component {
     }
   }
 
-  touchEnd(e) {
-    e.stopPropagation()
-    this.setState({ moveMode: "↔", functionMode: "•" })
+  moveTouchEnd(e) {
+    this.setState({ moveMode: "↔" })
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // FUNCTION TOUCH HANDLERS
+  //////////////////////////////////////////////////////////////////////////////
+
+  functionTouchStart(e) {
+    const touch = e.touches.length - 1
+    this.setState({
+      functionMode: "delete",
+      functionTouch: touch
+      // functionStartX: e.touches[touch].clientX,
+      // functionStartY: e.touches[touch].clientY,
+    })
+  }
+
+  functionTouchMove(e) {
+    console.log(this.state)
+  }
+
+  functionTouchEnd(e) {
+    this.setState({ functionMode: "delete" })
   }
 
   render() {
     return (
       <Toolbar>
-        <Button>•</Button>
         <Button
-          onTouchStart={e => this.touchStart(e)}
-          onTouchMove={e => this.touchMove(e)}
-          onTouchEnd={e => this.touchEnd(e)}
+          onTouchStart={e => this.functionTouchStart(e)}
+          onTouchMove={e => this.functionTouchMove(e)}
+          onTouchEnd={e => this.functionTouchEnd(e)}
+          onClick={e => this.execCommand("delWordAfter")}
+        >
+          {this.state.functionMode}
+        </Button>
+        <Button
+          onTouchStart={e => this.moveTouchStart(e)}
+          onTouchMove={e => this.moveTouchMove(e)}
+          onTouchEnd={e => this.moveTouchEnd(e)}
         >
           {this.state.moveMode}
         </Button>

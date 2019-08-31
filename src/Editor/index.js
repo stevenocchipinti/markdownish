@@ -83,6 +83,7 @@ class Editor extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    console.log(",")
     if (prevState.data !== this.state.data) {
       this.preserveCursor(() => this.codeMirror.doc.setValue(this.props.data))
       if (this.state.data !== this.props.data) {
