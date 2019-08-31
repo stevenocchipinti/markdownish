@@ -1,12 +1,11 @@
 import React, { Component } from "react"
 import styled, { createGlobalStyle } from "styled-components"
 import CodeMirror from "codemirror"
-
-import DragButtons from "./DragButtons"
-
 import "codemirror/lib/codemirror.css"
 import "codemirror/mode/gfm/gfm.js"
 import "./markdownish-theme.css"
+
+import Toolbar from "./Toolbar"
 
 const Section = styled.section`
   display: flex;
@@ -21,20 +20,13 @@ const GlobalStyle = createGlobalStyle`
     font-size: 16px;
     padding: 30px;
     height: 100%;
+
+    /*@media (prefers-color-scheme: dark) {
+      background-color: #111;
+      color: #eee;
+    }*/
   }
-`
 
-const Toolbar = styled.div`
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  border-top: 1px solid #ddd;
-  padding: 10px;
-
-  //   @media (prefers-color-scheme: dark) {
-  //     background-color: #444;
-  //     color: white;
-  //   }
 `
 
 // This is an uncontrolled component because CodeMirror is uncontrolled by
@@ -104,25 +96,13 @@ class Editor extends Component {
     }
   }
 
-  prev() {
-    this.codeMirror.focus()
-    this.codeMirror.execCommand("goWordLeft")
-  }
-
-  next() {
-    this.codeMirror.focus()
-    this.codeMirror.execCommand("goWordRight")
-  }
-
   render() {
     const { data } = this.props
     return (
       <Section>
         <GlobalStyle />
         <textarea ref={this.textAreaRef} defaultValue={data} />
-        <Toolbar>
-          <DragButtons next={e => this.next()} prev={e => this.prev()} />
-        </Toolbar>
+        <Toolbar codeMirror={this.codeMirror} />
       </Section>
     )
   }
