@@ -1,7 +1,6 @@
 const data = {
   notes: [
     {
-      title: "Sample",
       data:
         "# Heading 1\n\n" +
         "## Heading 2\n\n" +
@@ -16,11 +15,9 @@ const data = {
         "An ordered list\n1. one\n2. two"
     },
     {
-      title: "Note 1",
       data: "hello"
     },
     {
-      title: "Note 2",
       data: "hello again"
     }
   ]

@@ -1,7 +1,6 @@
 import React, { Component } from "react"
 import styled, { createGlobalStyle } from "styled-components"
 import Editor from "./Editor"
-import notes from "./data"
 
 const GlobalStyle = createGlobalStyle`
   *, ::after, ::before {
@@ -67,12 +66,51 @@ const findH1 = str => {
   return (title && title.replace(/# /, "")) || "Untitled"
 }
 
+const summary = str => {
+  const [firstLine, ...otherLines] = str.split("\n")
+  return firstLine.match(/^# /) ? otherLines : str
+}
+
+const nullNote = { data: "" }
+
 class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      note: notes.notes[0]
+      notes: [nullNote],
+      selectedNoteIndex: 0
     }
+  }
+
+  componentDidMount() {
+    const notesJSON = localStorage.getItem("notes")
+    const notes = notesJSON ? JSON.parse(notesJSON) : []
+    const selectedNoteIndex = 0
+    this.setState({ notes, selectedNoteIndex })
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevState.notes[prevState.selectedNoteIndex].data !==
+        this.selectedNote().data &&
+      this.selectedNote().data
+    ) {
+      localStorage.setItem("notes", JSON.stringify(this.state.notes))
+    }
+  }
+
+  selectedNote() {
+    return this.state.notes[this.state.selectedNoteIndex] || nullNote
+  }
+
+  updateSelectedNote({ data }) {
+    this.setState(({ notes, selectedNoteIndex }) => ({
+      notes: [
+        ...notes.slice(0, selectedNoteIndex),
+        { data },
+        ...notes.slice(selectedNoteIndex + 1)
+      ]
+    }))
   }
 
   render() {
@@ -82,19 +120,19 @@ class App extends Component {
         {/* <Sidebar /> */}
         <NoteList>
           <SearchBar placeholder="Filter" />
-          {notes.notes.map((note, index) => (
+          {this.state.notes.map((note, index) => (
             <Item
-              onClick={e => this.setState({ note })}
+              onClick={e => this.setState({ selectedNoteIndex: index })}
               key={index}
               heading={findH1(note.data)}
             >
-              {note.data}
+              {summary(note.data)}
             </Item>
           ))}
         </NoteList>
         <Editor
-          onChange={d => this.setState({ note: d })}
-          data={this.state.note.data}
+          onChange={data => this.updateSelectedNote(data)}
+          data={this.selectedNote().data}
         />
       </Layout>
     )

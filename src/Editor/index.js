@@ -18,7 +18,7 @@ const GlobalStyle = createGlobalStyle`
     font-family: Nunito, Arial, monospace;
     font-size: 16px;
     padding: 30px;
-    height: calc(100vh - 60px);
+    height: 100%;
   }
 `
 
@@ -43,12 +43,12 @@ class Editor extends Component {
   preserveCursor(action) {
     const cursor = this.codeMirror.doc.getCursor()
 
-    console.log("BEFORE")
-    const length = this.codeMirror.doc.getLine(cursor.line).length
-    const lastCharOfLine = length === cursor.ch
-    console.log("line length", length)
-    console.log("last char", lastCharOfLine)
-    console.log("cursor", cursor)
+    // console.log("BEFORE")
+    // const length = this.codeMirror.doc.getLine(cursor.line).length
+    // const lastCharOfLine = length === cursor.ch
+    // console.log("line length", length)
+    // console.log("last char", lastCharOfLine)
+    // console.log("cursor", cursor)
 
     action()
 
