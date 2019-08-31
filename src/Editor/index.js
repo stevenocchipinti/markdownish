@@ -29,10 +29,30 @@ const Toolbar = styled.div`
   z-index: 2;
 `
 
-class App extends Component {
+const TitleEditor = styled.input`
+  width: 100%;
+  border: none;
+  font-size: 4rem;
+  font-family: Nunito, Arial, monospace;
+  padding: 0 2rem;
+  margin-top: 2rem;
+
+  &:focus {
+    outline: none;
+  }
+`
+
+// This is an uncontrolled component because CodeMirror is uncontrolled by
+// default. The onChange handler works as expected though.
+// This would be better controlled but not sure how yet.
+class Editor extends Component {
   constructor(props) {
     super(props)
     this.textAreaRef = React.createRef()
+    this.state = {
+      title: props.defaultTitle,
+      data: props.defaultData
+    }
   }
 
   componentDidMount() {
@@ -45,8 +65,17 @@ class App extends Component {
         gitHubSpice: false
       }
     })
+    this.codeMirror.on("change", (cm, c) =>
+      this.setState({ data: cm.doc.getValue() })
+    )
     // Hack to make the actual line heights match what is displayed
     setTimeout(() => this.codeMirror.refresh(), 250)
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { title, data } = this.state
+    if (prevState.title !== title || prevState.data !== data)
+      this.props.onChange(this.state)
   }
 
   prev() {
@@ -60,22 +89,15 @@ class App extends Component {
   }
 
   render() {
-    const sample =
-      "# Heading 1\n\n" +
-      "## Heading 2\n\n" +
-      "### Heading 3\n\n" +
-      "#### Heading 4\n\n" +
-      "##### Heading 5\n\n" +
-      "###### Heading 6\n\n" +
-      "Hello there. What is **happening**? I have no idea.\n\n" +
-      "---\n\n" +
-      "**Bold**, _italic_, ~strikethrough~\n\n" +
-      "An unordered list\n* one\n* two\n\n" +
-      "An ordered list\n1. one\n2. two"
+    const { title, data } = this.state
     return (
       <Section>
         <GlobalStyle />
-        <textarea ref={this.textAreaRef} defaultValue={sample} />
+        <TitleEditor
+          onChange={e => this.setState({ title: e.target.value })}
+          value={title}
+        />
+        <textarea ref={this.textAreaRef} defaultValue={data} />
         <Toolbar>
           <button onClick={e => this.prev()}>Prev</button>
           <button onClick={e => this.next()}>Next</button>
@@ -85,4 +107,4 @@ class App extends Component {
   }
 }
 
-export default App
+export default Editor
