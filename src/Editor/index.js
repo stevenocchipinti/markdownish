@@ -55,6 +55,29 @@ class Editor extends Component {
     }
   }
 
+  preserveCursor(action) {
+    const cursor = this.codeMirror.doc.getCursor()
+
+    console.log("BEFORE")
+    const length = this.codeMirror.doc.getLine(cursor.line).length
+    const lastCharOfLine = length === cursor.ch
+    console.log("line length", length)
+    console.log("last char", lastCharOfLine)
+    console.log("cursor", cursor)
+
+    action()
+
+    // console.log("AFTER")
+    // const cursor = this.codeMirror.doc.getCursor()
+    // const length = this.codeMirror.doc.getLine(cursor.line).length
+    // const lastCharOfLine = length === cursor.ch
+    // console.log("line length", length)
+    // console.log("last char", lastCharOfLine)
+    // console.log("cursor", cursor)
+
+    this.codeMirror.doc.setCursor(cursor)
+  }
+
   componentDidMount() {
     this.codeMirror = CodeMirror.fromTextArea(this.textAreaRef.current, {
       lineWrapping: true,
@@ -65,17 +88,27 @@ class Editor extends Component {
         gitHubSpice: false
       }
     })
-    this.codeMirror.on("change", (cm, c) =>
+    this.codeMirror.on("change", cm => {
       this.setState({ data: cm.doc.getValue() })
-    )
+    })
     // Hack to make the actual line heights match what is displayed
     setTimeout(() => this.codeMirror.refresh(), 250)
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { title, data } = this.state
-    if (prevState.title !== title || prevState.data !== data)
-      this.props.onChange(this.state)
+    if (prevState.data !== this.state.data) {
+      this.preserveCursor(() => this.codeMirror.doc.setValue(this.props.data))
+      if (this.state.data !== this.props.data) {
+        this.props.onChange({
+          title: this.props.title,
+          data: this.state.data
+        })
+      }
+    }
+
+    if (prevProps.data !== this.props.data) {
+      this.preserveCursor(() => this.codeMirror.doc.setValue(this.props.data))
+    }
   }
 
   prev() {
@@ -89,14 +122,11 @@ class Editor extends Component {
   }
 
   render() {
-    const { title, data } = this.state
+    const { title, data } = this.props
     return (
       <Section>
         <GlobalStyle />
-        <TitleEditor
-          onChange={e => this.setState({ title: e.target.value })}
-          value={title}
-        />
+        <TitleEditor value={title} onChange={() => {}} />
         <textarea ref={this.textAreaRef} defaultValue={data} />
         <Toolbar>
           <button onClick={e => this.prev()}>Prev</button>

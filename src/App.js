@@ -101,11 +101,9 @@ class App extends Component {
           <Item heading="A Note">This is a note with some stuff in it</Item>
         </NoteList>
         <Editor
-          onChange={d => {
-            console.log(d)
-          }}
-          defaultTitle={this.state.title}
-          defaultData={this.state.data}
+          onChange={d => this.setState(d)}
+          title={this.state.title}
+          data={this.state.data}
         />
       </Layout>
     )
