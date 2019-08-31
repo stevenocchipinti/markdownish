@@ -2,6 +2,8 @@ import React, { Component } from "react"
 import styled, { createGlobalStyle } from "styled-components"
 import CodeMirror from "codemirror"
 
+import DragButtons from "./DragButtons"
+
 import "codemirror/lib/codemirror.css"
 import "codemirror/mode/gfm/gfm.js"
 import "./markdownish-theme.css"
@@ -23,9 +25,16 @@ const GlobalStyle = createGlobalStyle`
 `
 
 const Toolbar = styled.div`
+  display: flex;
+  justify-content: center;
   width: 100%;
   border-top: 1px solid #ddd;
   padding: 10px;
+
+  //   @media (prefers-color-scheme: dark) {
+  //     background-color: #444;
+  //     color: white;
+  //   }
 `
 
 // This is an uncontrolled component because CodeMirror is uncontrolled by
@@ -112,8 +121,7 @@ class Editor extends Component {
         <GlobalStyle />
         <textarea ref={this.textAreaRef} defaultValue={data} />
         <Toolbar>
-          <button onClick={e => this.prev()}>Prev</button>
-          <button onClick={e => this.next()}>Next</button>
+          <DragButtons next={e => this.next()} prev={e => this.prev()} />
         </Toolbar>
       </Section>
     )

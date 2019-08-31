@@ -27,6 +27,10 @@ const NoteList = styled.section`
   width: 250px;
   border-right: 1px solid #ddd;
   flex-shrink: 0;
+
+  @media (max-width: 500px) {
+    display: none;
+  }
 `
 
 const SearchBar = styled.input`
