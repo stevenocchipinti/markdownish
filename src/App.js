@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import styled, { createGlobalStyle } from "styled-components"
 import Editor from "./Editor"
+import notes from "./data"
 
 const GlobalStyle = createGlobalStyle`
   *, ::after, ::before {
@@ -48,45 +49,30 @@ const ItemHeading = styled.div`
   margin-bottom: 1em;
 `
 
-const Item = ({ heading, children }) => (
-  <ItemCard>
+const ItemPreview = styled.div`
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+`
+
+const Item = ({ heading, children, ...props }) => (
+  <ItemCard {...props}>
     <ItemHeading>{heading}</ItemHeading>
-    <div>{children}</div>
+    <ItemPreview>{children}</ItemPreview>
   </ItemCard>
 )
 
-const sampleNote = {
-  title: "Sample",
-  data:
-    "# Heading 1\n\n" +
-    "## Heading 2\n\n" +
-    "### Heading 3\n\n" +
-    "#### Heading 4\n\n" +
-    "##### Heading 5\n\n" +
-    "###### Heading 6\n\n" +
-    "Hello there. What is **happening**? I have no idea.\n\n" +
-    "---\n\n" +
-    "**Bold**, _italic_, ~strikethrough~\n\n" +
-    "An unordered list\n* one\n* two\n\n" +
-    "An ordered list\n1. one\n2. two"
-}
-
-const newNote = {
-  title: "new title",
-  data: "more stuff"
+const findH1 = str => {
+  const title = str.split("\n").find(s => s.match(/^# /))
+  return (title && title.replace(/# /, "")) || "Untitled"
 }
 
 class App extends Component {
   constructor(props) {
     super(props)
-    this.state = sampleNote
-  }
-
-  componentDidMount() {
-    setTimeout(() => {
-      console.log("change!")
-      this.setState(newNote)
-    }, 3000)
+    this.state = {
+      note: notes.notes[0]
+    }
   }
 
   render() {
@@ -96,14 +82,19 @@ class App extends Component {
         {/* <Sidebar /> */}
         <NoteList>
           <SearchBar placeholder="Filter" />
-          <Item heading="A Note">This is a note with some stuff in it</Item>
-          <Item heading="A Note">This is a note with some stuff in it</Item>
-          <Item heading="A Note">This is a note with some stuff in it</Item>
+          {notes.notes.map((note, index) => (
+            <Item
+              onClick={e => this.setState({ note })}
+              key={index}
+              heading={findH1(note.data)}
+            >
+              {note.data}
+            </Item>
+          ))}
         </NoteList>
         <Editor
-          onChange={d => this.setState(d)}
-          title={this.state.title}
-          data={this.state.data}
+          onChange={d => this.setState({ note: d })}
+          data={this.state.note.data}
         />
       </Layout>
     )

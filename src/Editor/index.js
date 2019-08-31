@@ -7,6 +7,8 @@ import "codemirror/mode/gfm/gfm.js"
 import "./markdownish-theme.css"
 
 const Section = styled.section`
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   width: 100%;
 `
@@ -21,25 +23,9 @@ const GlobalStyle = createGlobalStyle`
 `
 
 const Toolbar = styled.div`
-  position: absolute;
-  bottom: 0;
   width: 100%;
   border-top: 1px solid #ddd;
   padding: 10px;
-  z-index: 2;
-`
-
-const TitleEditor = styled.input`
-  width: 100%;
-  border: none;
-  font-size: 4rem;
-  font-family: Nunito, Arial, monospace;
-  padding: 0 2rem;
-  margin-top: 2rem;
-
-  &:focus {
-    outline: none;
-  }
 `
 
 // This is an uncontrolled component because CodeMirror is uncontrolled by
@@ -50,7 +36,6 @@ class Editor extends Component {
     super(props)
     this.textAreaRef = React.createRef()
     this.state = {
-      title: props.defaultTitle,
       data: props.defaultData
     }
   }
@@ -100,7 +85,6 @@ class Editor extends Component {
       this.preserveCursor(() => this.codeMirror.doc.setValue(this.props.data))
       if (this.state.data !== this.props.data) {
         this.props.onChange({
-          title: this.props.title,
           data: this.state.data
         })
       }
@@ -122,11 +106,10 @@ class Editor extends Component {
   }
 
   render() {
-    const { title, data } = this.props
+    const { data } = this.props
     return (
       <Section>
         <GlobalStyle />
-        <TitleEditor value={title} onChange={() => {}} />
         <textarea ref={this.textAreaRef} defaultValue={data} />
         <Toolbar>
           <button onClick={e => this.prev()}>Prev</button>
