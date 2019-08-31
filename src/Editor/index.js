@@ -77,7 +77,7 @@ class Editor extends Component {
       this.setState({ data: cm.doc.getValue() })
     })
     // Hack to make the actual line heights match what is displayed
-    setTimeout(() => this.codeMirror.refresh(), 250)
+    setTimeout(() => this.codeMirror.refresh(), 500)
   }
 
   componentDidUpdate(prevProps, prevState) {

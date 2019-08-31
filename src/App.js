@@ -38,7 +38,7 @@ const SearchBar = styled.input`
 `
 
 const ItemCard = styled.article`
-  padding: 30px;
+  padding: 2rem;
   border-bottom: 1px solid #ddd;
 `
 
@@ -78,7 +78,8 @@ class App extends Component {
     super(props)
     this.state = {
       notes: [nullNote],
-      selectedNoteIndex: 0
+      selectedNoteIndex: 0,
+      filter: ""
     }
   }
 
@@ -114,21 +115,29 @@ class App extends Component {
   }
 
   render() {
+    const filterRegex = new RegExp(this.state.filter.split("").join(".*"), "i")
     return (
       <Layout>
         <GlobalStyle />
         {/* <Sidebar /> */}
         <NoteList>
-          <SearchBar placeholder="Filter" />
-          {this.state.notes.map((note, index) => (
-            <Item
-              onClick={e => this.setState({ selectedNoteIndex: index })}
-              key={index}
-              heading={findH1(note.data)}
-            >
-              {summary(note.data)}
-            </Item>
-          ))}
+          <SearchBar
+            placeholder="Filter"
+            value={this.state.filter}
+            onChange={e => this.setState({ filter: e.target.value })}
+          />
+          {this.state.notes
+            .map((note, index) => ({ ...note, index }))
+            .filter(note => note.data.match(filterRegex))
+            .map((note, index) => (
+              <Item
+                onClick={e => this.setState({ selectedNoteIndex: index })}
+                key={index}
+                heading={findH1(note.data)}
+              >
+                {summary(note.data)}
+              </Item>
+            ))}
         </NoteList>
         <Editor
           onChange={data => this.updateSelectedNote(data)}
