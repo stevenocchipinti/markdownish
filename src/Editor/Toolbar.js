@@ -13,6 +13,10 @@ const Toolbar = styled.div`
   padding: 10px;
   background-color: white;
   z-index: 2;
+
+  @media (min-width: 500px) {
+    display: none;
+  }
 `
 
 const Button = styled.button`
@@ -50,41 +54,32 @@ export default class NavigationToolbar extends Component {
   }
 
   left() {
-    let command = ""
-    if (this.state.functionMode === "delete")
-      command = {
-        word: "delWordBefore",
-        line: "delWrappedLineLeft",
-        doc: ""
-      }[this.state.moveMode]
-    else
-      command = {
-        word: "goWordLeft",
-        line: "goLineUp",
-        doc: "goDocStart"
-      }[this.state.moveMode]
-    this.execCommand(command)
+    const { functionMode, moveMode } = this.state
+    if (functionMode === "delete") {
+      if (moveMode === "word") this.execCommand("delWordBefore")
+      if (moveMode === "line") this.execCommand("delWrappedLineLeft")
+    } else {
+      if (moveMode === "word") this.execCommand("goWordLeft")
+      if (moveMode === "line") this.execCommand("goLineUp")
+      if (moveMode === "doc") this.execCommand("goDocStart")
+      if (moveMode === "para") this.goto(/\n\n/, "prev")
+    }
   }
 
   right() {
-    let command = ""
-    if (this.state.functionMode === "delete")
-      command = {
-        word: "delWordAfter",
-        line: "delWrappedLineRight",
-        doc: ""
-      }[this.state.moveMode]
-    else
-      command = {
-        word: "goWordRight",
-        line: "goLineDown",
-        doc: "goDocEnd"
-      }[this.state.moveMode]
-    this.execCommand(command)
+    const { functionMode, moveMode } = this.state
+    if (functionMode === "delete") {
+      if (moveMode === "word") this.execCommand("delWordAfter")
+      if (moveMode === "line") this.execCommand("delWrappedLineRight")
+    } else {
+      if (moveMode === "word") this.execCommand("goWordRight")
+      if (moveMode === "line") this.execCommand("goLineDown")
+      if (moveMode === "doc") this.execCommand("goDocEnd")
+      if (moveMode === "para") this.goto(/\n\n/)
+    }
   }
 
   execCommand(command) {
-    console.log(command)
     this.props.codeMirror.focus()
     this.props.codeMirror.execCommand(command)
     navigator.vibrate(10)
@@ -112,7 +107,7 @@ export default class NavigationToolbar extends Component {
 
     let newMoveMode = "word"
     if (Ydiff < -80) newMoveMode = "doc"
-    else if (Ydiff < -40) newMoveMode = "line"
+    else if (Ydiff < -40) newMoveMode = "para"
 
     if (newMoveMode !== moveMode) {
       this.setState({ moveMode: newMoveMode })
@@ -151,12 +146,16 @@ export default class NavigationToolbar extends Component {
 
   //////////////////////////////////////////////////////////////////////////////
 
-  nextP() {
+  goto(pattern, direction = "next") {
     const doc = this.props.codeMirror.getDoc()
     const cursor = doc.getCursor()
-    const result = doc.getSearchCursor(/\n\n/, { line: cursor.line })
-    if (result.findNext()) {
-      console.log(result.pos.to.line)
+    const result = doc.getSearchCursor(pattern, {
+      line: direction === "next" ? cursor.line : cursor.line - 1
+    })
+    if (
+      (direction === "next" && result.findNext()) ||
+      (direction === "prev" && result.findPrevious())
+    ) {
       this.props.codeMirror.focus()
       doc.setCursor(result.pos.to.line)
     }
@@ -179,7 +178,6 @@ export default class NavigationToolbar extends Component {
         >
           {this.state.moveMode}
         </Button>
-        <Button onClick={e => this.nextP()}>next-p</Button>
       </Toolbar>
     )
   }

@@ -56,8 +56,6 @@ class Editor extends Component {
       this.codeMirror.focus()
       this.codeMirror.doc.setCursor({ line: 0, ch: 0 })
     }, 500)
-
-    window.doc = this.codeMirror.getDoc()
   }
 
   render() {

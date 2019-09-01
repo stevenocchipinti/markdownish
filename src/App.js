@@ -87,7 +87,6 @@ class App extends Component {
 
   render() {
     const filterRegex = new RegExp(this.state.filter.split("").join(".*"), "i")
-    console.log(this.state)
     return (
       <Layout>
         <GlobalStyle />
