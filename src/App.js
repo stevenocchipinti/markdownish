@@ -76,7 +76,6 @@ class App extends Component {
   }
 
   updateSelectedNote({ data }) {
-    console.log(";")
     this.setState(({ notes, selectedNoteIndex }) => ({
       notes: [
         ...notes.slice(0, selectedNoteIndex),
@@ -88,6 +87,7 @@ class App extends Component {
 
   render() {
     const filterRegex = new RegExp(this.state.filter.split("").join(".*"), "i")
+    console.log(this.state)
     return (
       <Layout>
         <GlobalStyle />
@@ -110,7 +110,7 @@ class App extends Component {
             ))}
         </NoteList>
         <Editor
-          onChange={data => this.updateSelectedNote(data)}
+          onChange={({ value }) => this.updateSelectedNote({ data: value })}
           data={this.selectedNote().data}
         />
       </Layout>

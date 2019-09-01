@@ -4,9 +4,10 @@ import styled from "styled-components"
 const Toolbar = styled.div`
   position: fixed;
   bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
   justify-content: space-evenly;
-  width: 100%;
   height: 4rem;
   border-top: 1px solid #ddd;
   padding: 10px;
@@ -31,7 +32,7 @@ export default class NavigationToolbar extends Component {
       moveStartX: null,
       moveStartY: null,
 
-      functionMode: "delete",
+      functionMode: "•",
       functionTouch: null,
       functionStartX: null,
       functionStartY: null,
@@ -41,7 +42,6 @@ export default class NavigationToolbar extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    console.log(".", prevState.steps, this.state.steps)
     if (prevState.steps > this.state.steps) {
       this.left()
     } else if (prevState.steps < this.state.steps) {
@@ -143,12 +143,23 @@ export default class NavigationToolbar extends Component {
     })
   }
 
-  functionTouchMove(e) {
-    console.log(this.state)
-  }
+  functionTouchMove(e) {}
 
   functionTouchEnd(e) {
-    this.setState({ functionMode: "delete" })
+    this.setState({ functionMode: "•" })
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+
+  nextP() {
+    const doc = this.props.codeMirror.getDoc()
+    const cursor = doc.getCursor()
+    const result = doc.getSearchCursor(/\n\n/, { line: cursor.line })
+    if (result.findNext()) {
+      console.log(result.pos.to.line)
+      this.props.codeMirror.focus()
+      doc.setCursor(result.pos.to.line)
+    }
   }
 
   render() {
@@ -158,7 +169,6 @@ export default class NavigationToolbar extends Component {
           onTouchStart={e => this.functionTouchStart(e)}
           onTouchMove={e => this.functionTouchMove(e)}
           onTouchEnd={e => this.functionTouchEnd(e)}
-          onClick={e => this.execCommand("delWordAfter")}
         >
           {this.state.functionMode}
         </Button>
@@ -169,6 +179,7 @@ export default class NavigationToolbar extends Component {
         >
           {this.state.moveMode}
         </Button>
+        <Button onClick={e => this.nextP()}>next-p</Button>
       </Toolbar>
     )
   }

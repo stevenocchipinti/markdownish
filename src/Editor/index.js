@@ -1,8 +1,11 @@
 import React, { Component } from "react"
 import styled, { createGlobalStyle } from "styled-components"
-import CodeMirror from "codemirror"
+import { Controlled as ControlledCodeMirror } from "react-codemirror2"
+
 import "codemirror/lib/codemirror.css"
 import "codemirror/mode/gfm/gfm.js"
+import "codemirror/addon/search/searchcursor.js"
+import "codemirror/addon/search/search.js"
 import "./markdownish-theme.css"
 
 import Toolbar from "./Toolbar"
@@ -27,7 +30,11 @@ const GlobalStyle = createGlobalStyle`
       color: #eee;
     }*/
   }
+`
 
+const CodeMirror = styled(ControlledCodeMirror)`
+  height: 100%;
+  margin-bottom: 4rem;
 `
 
 // This is an uncontrolled component because CodeMirror is uncontrolled by
@@ -36,37 +43,25 @@ const GlobalStyle = createGlobalStyle`
 class Editor extends Component {
   constructor(props) {
     super(props)
-    this.textAreaRef = React.createRef()
+    this.codeMirror = null
     this.state = {
-      data: props.defaultData
+      value: "# "
     }
   }
 
-  preserveCursor(action) {
-    const cursor = this.codeMirror.doc.getCursor()
+  componentDidMount() {
+    // Hack to make the variable line heights match what is displayed
+    setTimeout(() => {
+      this.codeMirror.refresh()
+      this.codeMirror.focus()
+      this.codeMirror.doc.setCursor({ line: 0, ch: 0 })
+    }, 500)
 
-    // console.log("BEFORE")
-    // const length = this.codeMirror.doc.getLine(cursor.line).length
-    // const lastCharOfLine = length === cursor.ch
-    // console.log("line length", length)
-    // console.log("last char", lastCharOfLine)
-    // console.log("cursor", cursor)
-
-    action()
-
-    // console.log("AFTER")
-    // const cursor = this.codeMirror.doc.getCursor()
-    // const length = this.codeMirror.doc.getLine(cursor.line).length
-    // const lastCharOfLine = length === cursor.ch
-    // console.log("line length", length)
-    // console.log("last char", lastCharOfLine)
-    // console.log("cursor", cursor)
-
-    this.codeMirror.doc.setCursor(cursor)
+    window.doc = this.codeMirror.getDoc()
   }
 
-  componentDidMount() {
-    this.codeMirror = CodeMirror.fromTextArea(this.textAreaRef.current, {
+  render() {
+    const options = {
       lineWrapping: true,
       theme: "markdownish",
       scrollbarStyle: "null",
@@ -74,36 +69,19 @@ class Editor extends Component {
         name: "gfm",
         gitHubSpice: false
       }
-    })
-    this.codeMirror.on("change", cm => {
-      this.setState({ data: cm.doc.getValue() })
-    })
-    // Hack to make the actual line heights match what is displayed
-    setTimeout(() => this.codeMirror.refresh(), 500)
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    console.log(",")
-    if (prevState.data !== this.state.data) {
-      this.preserveCursor(() => this.codeMirror.doc.setValue(this.props.data))
-      if (this.state.data !== this.props.data) {
-        this.props.onChange({
-          data: this.state.data
-        })
-      }
     }
 
-    if (prevProps.data !== this.props.data) {
-      this.preserveCursor(() => this.codeMirror.doc.setValue(this.props.data))
-    }
-  }
-
-  render() {
-    const { data } = this.props
     return (
       <Section>
         <GlobalStyle />
-        <textarea ref={this.textAreaRef} defaultValue={data} />
+        <CodeMirror
+          value={this.props.data}
+          options={options}
+          onBeforeChange={(editor, data, value) => {
+            this.props.onChange({ value })
+          }}
+          editorDidMount={editor => (this.codeMirror = editor)}
+        />
         <Toolbar codeMirror={this.codeMirror} />
       </Section>
     )
