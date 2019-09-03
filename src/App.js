@@ -27,6 +27,10 @@ const NoteList = styled.section`
   width: 250px;
   border-right: 1px solid #ddd;
   flex-shrink: 0;
+
+  @media (max-width: 500px) {
+    display: none;
+  }
 `
 
 const SearchBar = styled.input`
@@ -52,7 +56,7 @@ class App extends Component {
 
   componentDidMount() {
     const notesJSON = localStorage.getItem("notes")
-    const notes = notesJSON ? JSON.parse(notesJSON) : []
+    const notes = notesJSON ? JSON.parse(notesJSON) : [nullNote]
     const selectedNoteIndex = 0
     this.setState({ notes, selectedNoteIndex })
   }
@@ -105,7 +109,7 @@ class App extends Component {
             ))}
         </NoteList>
         <Editor
-          onChange={data => this.updateSelectedNote(data)}
+          onChange={({ value }) => this.updateSelectedNote({ data: value })}
           data={this.selectedNote().data}
         />
       </Layout>
